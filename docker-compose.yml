@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: olist_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - olist_net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: olist_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin  # <-- Added volume for pgAdmin
+    networks:
+      - olist_net
+
+  metabase:
+    image: metabase/metabase
+    container_name: olist_metabase
+    ports:
+      - "3001:3000"  # Changed port to avoid conflict
+    volumes:
+      - metabase_data:/metabase-data  # <-- Added volume for Metabase
+    networks:
+      - olist_net
+
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: olist_etl
+    depends_on:
+      - postgres
+    networks:
+      - olist_net
+
+volumes:
+  pgdata:
+  pgadmin_data:       # <-- Now pgAdmin settings (servers etc) will be persistent
+  metabase_data:      # <-- Now Metabase dashboards/questions will be persistent
+
+networks:
+  olist_net:

@@ -1,0 +1,19 @@
+# Environment Variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Docker volumes
+pgdata/
+
+# Data files (raw CSVs)
+data/
+
+# System files
+.DS_Store
+
+# Log files
+*.log
+
